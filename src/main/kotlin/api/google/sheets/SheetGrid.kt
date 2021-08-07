@@ -12,10 +12,20 @@ class SheetGrid(val range: SheetRange, valueRange: ValueRange) {
         gridValues[cell] = value
     }
 
+    fun getRow(row: SheetDimension): List<SheetValue> =
+        range.rowSequence(row)
+            .map { cell -> SheetValue(cell, get(cell)) }
+            .toList()
+
+    fun getColumn(col: SheetDimension): List<SheetValue> =
+        range.columnSequence(col)
+            .map { cell -> SheetValue(cell, get(cell)) }
+            .toList()
+
     private val gridValues: MutableMap<SheetCell, String> =
-        valueRange.getValues().flatMapIndexed { rowIndex, inputRowValues ->
-            inputRowValues.mapIndexed { colIndex, value ->
-                val cell = SheetCell.fromIndexes(colIndex, rowIndex)
+        valueRange.getValues().flatMapIndexed { relativeRowIndex, inputRowValues ->
+            inputRowValues.mapIndexed { relativeColIndex, value ->
+                val cell = range.getRelativeCell(relativeColIndex, relativeRowIndex)
                 value as String
                 cell to value
             }
