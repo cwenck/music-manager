@@ -6,6 +6,42 @@ class SheetCell private constructor(val colIndex: Int, val rowIndex: Int) {
     fun toSheetNotation() = "${indexToName(colIndex)}${indexToNumberText(rowIndex)}"
     fun toRowColumnNotation() = "R${indexToNumberText(rowIndex)}C${indexToNumberText(colIndex)}"
 
+    fun atRow(rowIndex: Int): SheetCell {
+        if (rowIndex < 0) throw IllegalArgumentException("Row index must be non-negative")
+        return SheetCell(this.colIndex, rowIndex)
+    }
+
+    fun atColumn(colIndex: Int): SheetCell {
+        if (rowIndex < 0) throw IllegalArgumentException("Column index must be non-negative")
+        return SheetCell(this.colIndex, rowIndex)
+    }
+
+    fun plusRows(count: Int): SheetCell {
+        if (count == 0) return this
+        if (count < 0) throw IllegalArgumentException("Count must be non-negative")
+        return SheetCell(colIndex, rowIndex + count)
+    }
+
+    fun plusColumns(count: Int): SheetCell {
+        if (count == 0) return this
+        if (count < 0) throw IllegalArgumentException("Count must be non-negative")
+        return SheetCell(colIndex + count, rowIndex)
+    }
+
+    fun minusRows(count: Int): SheetCell {
+        if (count == 0) return this
+        if (count < 0) throw IllegalArgumentException("Count must be non-negative")
+        if (count > rowIndex) throw IllegalArgumentException("Count cannot exceed the row index")
+        return SheetCell(colIndex, rowIndex - count)
+    }
+
+    fun minusColumns(count: Int): SheetCell {
+        if (count == 0) return this
+        if (count < 0) throw IllegalArgumentException("Count must be non-negative")
+        if (count > rowIndex) throw IllegalArgumentException("Count cannot exceed the column index")
+        return SheetCell(colIndex - count, rowIndex)
+    }
+
     companion object {
         private val SHEET_NOTATION_REGEX = """^([A-Z]+)([1-9][0-9]*)$""".toRegex()
 
@@ -62,5 +98,9 @@ class SheetCell private constructor(val colIndex: Int, val rowIndex: Int) {
         var result = colIndex
         result = 31 * result + rowIndex
         return result
+    }
+
+    override fun toString(): String {
+        return toSheetNotation()
     }
 }

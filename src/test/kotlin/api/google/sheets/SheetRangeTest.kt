@@ -27,7 +27,7 @@ class SheetRangeTest {
 
     @Test(dataProvider = "fromSheetCellsData")
     fun testFromSheetCellsData(range: SheetRange, expectedRangeStart: SheetCell, expectedRangeEnd: SheetCell) {
-        assertEquals(range.rangeStart, expectedRangeStart)
-        assertEquals(range.rangeEnd, expectedRangeEnd)
+        assertEquals(range.startCell, expectedRangeStart)
+        assertEquals(range.endCell, expectedRangeEnd)
     }
 }
