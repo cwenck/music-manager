@@ -48,34 +48,6 @@ class SheetCell private constructor(val col: SheetDimension, val row: SheetDimen
             val rowNumber = rowNumberText.toInt()
             return SheetCell(fromName(columnName), fromNumber(rowNumber))
         }
-
-//        private fun indexToName(index: Int): String {
-//            var dividend = index + 1
-//            var result = ""
-//
-//            while (dividend > 0) {
-//                val remainder = (dividend - 1) % 26
-//                result = ('A' + remainder) + result
-//                dividend = (dividend - remainder) / 26
-//            }
-//
-//            return result
-//        }
-//
-//        private fun nameToIndex(name: String): Int {
-//            var result = 0
-//            val normalizedName = name.uppercase()
-//            for (i: Int in normalizedName.indices) {
-//                val digitPosition = (normalizedName.length - i - 1)
-//                val digit = (normalizedName[i] - 'A') + 1
-//                result += digit * pow(26, digitPosition)
-//            }
-//
-//            return result - 1
-//        }
-//
-//        private fun indexToNumberText(index: Int): String = "${index + 1}"
-//        private fun numberToIndex(number: Int): Int = number - 1
     }
 
 
