@@ -13,12 +13,12 @@ class SheetGrid(val range: SheetRange, valueRange: ValueRange) {
     }
 
     fun getRow(row: SheetDimension): List<SheetValue> =
-        range.rowSequence(row)
+        range.rowCellsSequence(row)
             .map { cell -> SheetValue(cell, get(cell)) }
             .toList()
 
     fun getColumn(col: SheetDimension): List<SheetValue> =
-        range.columnSequence(col)
+        range.columnCellsSequence(col)
             .map { cell -> SheetValue(cell, get(cell)) }
             .toList()
 

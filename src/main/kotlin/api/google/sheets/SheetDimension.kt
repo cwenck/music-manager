@@ -8,6 +8,7 @@ class SheetDimension private constructor(val index: Int) {
 
     operator fun plus(count: Int): SheetDimension = fromIndex(index + count)
     operator fun minus(count: Int): SheetDimension = fromIndex(index - count)
+    operator fun compareTo(dim: SheetDimension): Int = index.compareTo(dim.index)
     operator fun compareTo(value: Int): Int = index.compareTo(value)
 
     companion object {

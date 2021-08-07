@@ -13,7 +13,7 @@ class SheetRange constructor(
     val columns = (endCell.col.index - startCell.col.index) + 1
     val rows = (endCell.row.index - startCell.row.index) + 1
 
-    fun rowSequence(row: SheetDimension): Sequence<SheetCell> {
+    fun rowCellsSequence(row: SheetDimension): Sequence<SheetCell> {
         if (!containsRow(row)) throw IllegalArgumentException("Row outside of range")
         return generateSequence(startCell.atRow(row)) { cell ->
             if (cell.col.index < endCell.col.index) {
@@ -24,7 +24,7 @@ class SheetRange constructor(
         }
     }
 
-    fun columnSequence(col: SheetDimension): Sequence<SheetCell> {
+    fun columnCellsSequence(col: SheetDimension): Sequence<SheetCell> {
         if (!containsColumn(col)) throw IllegalArgumentException("Column outside of range")
         return generateSequence(startCell.atColumn(col)) { cell ->
             if (cell.row.index < endCell.row.index) {
@@ -32,6 +32,23 @@ class SheetRange constructor(
             } else {
                 null
             }
+        }
+    }
+
+    fun rowsSequence(): Sequence<SheetDimension> = generateSequence(startCell.row) { dim ->
+        if (dim < endCell.row) {
+            dim + 1
+        } else {
+            null
+        }
+    }
+
+
+    fun columnsSequence(): Sequence<SheetDimension> = generateSequence(startCell.col) { dim ->
+        if (dim < endCell.col) {
+            dim + 1
+        } else {
+            null
         }
     }
 
@@ -111,8 +128,8 @@ class SheetRange constructor(
         }
 
         fun fromSheetNotation(notation: String): SheetRange {
-            val matchResult = SHEET_NOTATION_REGEX.find(notation.uppercase())
-            val (startCellNotation, endCellNotation) = matchResult!!.destructured
+            val matchResult = SHEET_NOTATION_REGEX.find(notation.uppercase())!!
+            val (startCellNotation, endCellNotation) = matchResult.destructured
             val startCell = SheetCell.fromSheetNotation(startCellNotation)
             val endCell = SheetCell.fromSheetNotation(endCellNotation)
             return fromSheetCells(startCell, endCell)

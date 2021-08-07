@@ -43,8 +43,8 @@ class SheetCell private constructor(val col: SheetDimension, val row: SheetDimen
 
         fun fromIndexes(colIndex: Int, rowIndex: Int) = SheetCell(fromIndex(colIndex), fromIndex(rowIndex))
         fun fromSheetNotation(notation: String): SheetCell {
-            val matchResult = SHEET_NOTATION_REGEX.find(notation.uppercase())
-            val (columnName, rowNumberText) = matchResult!!.destructured
+            val matchResult = SHEET_NOTATION_REGEX.find(notation.uppercase())!!
+            val (columnName, rowNumberText) = matchResult.destructured
             val rowNumber = rowNumberText.toInt()
             return SheetCell(fromName(columnName), fromNumber(rowNumber))
         }
