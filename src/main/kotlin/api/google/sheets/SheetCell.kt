@@ -42,6 +42,7 @@ class SheetCell private constructor(val col: SheetDimension, val row: SheetDimen
         private val SHEET_NOTATION_REGEX = """^([A-Z]+)([1-9][0-9]*)$""".toRegex()
 
         fun fromIndexes(colIndex: Int, rowIndex: Int) = SheetCell(fromIndex(colIndex), fromIndex(rowIndex))
+        fun fromDimensions(col: SheetDimension, row: SheetDimension) = SheetCell(col, row)
         fun fromSheetNotation(notation: String): SheetCell {
             val matchResult = SHEET_NOTATION_REGEX.find(notation.uppercase())!!
             val (columnName, rowNumberText) = matchResult.destructured

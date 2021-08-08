@@ -1,19 +1,31 @@
 import api.google.GoogleApiUtil
 import api.google.sheets.SpreadsheetHelper
+import api.spotify.SpotifyApiUtil
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
-import playlist.GoogleSheetsPlaylistLoader
-
-private val SPREADSHEET_ID = "1Bs1WCVUM6KmWlKJ8cyvBjbkbWSzbdGh0QFonqJymMB8"
+import playlist.GoogleSheetsPlaylistManager
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
+    if (args.size != 1) {
+        System.err.println("Usage: music-manager <Google Sheets ID>")
+        exitProcess(1)
+    }
+
+    val spreadsheetId = args[0]
     val transport = GoogleNetHttpTransport.newTrustedTransport();
-    val sheetsApi = GoogleApiUtil.getSheetsApi(transport)
+    val spotifyApi = SpotifyApiUtil.getApi()
 
-    sheetsApi.spreadsheets().values().batchGet(SPREADSHEET_ID).execute()
-    val api = SpreadsheetHelper(sheetsApi, SPREADSHEET_ID)
-    val sheetsPlaylistLoader = GoogleSheetsPlaylistLoader(api)
-    val playlist = sheetsPlaylistLoader.loadPlaylist("Groovy Baby")
+    val sheetsApi = SpreadsheetHelper(GoogleApiUtil.getSheetsApi(transport), spreadsheetId)
+    val sheetsPlaylistLoader = GoogleSheetsPlaylistManager(sheetsApi)
 
-    println(playlist)
-//    println(sheet)
+    val worksheetTitle = "Groovy Baby"
+    val playlistMetadata = sheetsPlaylistLoader.loadPlaylistMetadata(worksheetTitle)
+    val (songs, songLocationRegistry) = sheetsPlaylistLoader.loadSongs(worksheetTitle)
+    val songsWithMetadata = spotifyApi.getSongsWithMetadata(songs)
+    val playlist = playlistMetadata.withSongs(songsWithMetadata)
+
+
+    spotifyApi.syncPlaylist(playlist)
+    sheetsPlaylistLoader.updateVersions(worksheetTitle, playlist)
+    sheetsPlaylistLoader.updateSongMetadata(worksheetTitle, songsWithMetadata, songLocationRegistry)
 }

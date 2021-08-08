@@ -19,10 +19,10 @@ import java.io.InputStreamReader
 object GoogleApiUtil {
 
     private const val APPLICATION_NAME = "Music Manager"
-    private const val TOKENS_DIRECTORY_PATH = "tokens"
-    private const val CREDENTIALS_PATH = "/credentials.json"
+    private const val TOKENS_DIRECTORY_PATH = "tokens/google/sheets"
+    private const val CREDENTIALS_PATH = "/secrets/google/sheets/credentials.json"
 
-    private val SCOPES = listOf(SheetsScopes.SPREADSHEETS)
+    private val scopes = listOf(SheetsScopes.SPREADSHEETS)
     private val jsonFactory: JsonFactory = JacksonFactory.getDefaultInstance()
 
     private fun getCredential(transport: NetHttpTransport): Credential {
@@ -32,7 +32,11 @@ object GoogleApiUtil {
         val clientSecrets = GoogleClientSecrets.load(jsonFactory, InputStreamReader(inputStream))
 
         // Build flow and trigger user authorization request.
-        val flow = GoogleAuthorizationCodeFlow.Builder(transport, jsonFactory, clientSecrets, SCOPES)
+        val flow = GoogleAuthorizationCodeFlow.Builder(transport,
+            jsonFactory,
+            GoogleApiConfiguration.clientId,
+            GoogleApiConfiguration.clientSecret,
+            scopes)
             .setDataStoreFactory(FileDataStoreFactory(File(TOKENS_DIRECTORY_PATH)))
             .setAccessType("offline")
             .build()

@@ -2,60 +2,81 @@ package playlist
 
 import org.apache.commons.codec.binary.Hex
 import org.apache.commons.codec.digest.DigestUtils
-import playlist.sync.action.*
+import java.util.*
 
-data class Playlist(
+class Playlist private constructor(
     val id: String,
-    val name: String,
-    val description: String,
-    val songs: List<Song>,
-    val lastSyncVersion: String? = null,
+    val songs: List<Song> = emptyList(),
+    val name: String = "",
+    val description: String = "",
+    val lastSyncMetadataVersion: String? = null,
+    val lastSyncSongVersion: String? = null,
 ) {
-    val currentVersion: String = calculateVersion()
 
-    private fun calculateVersion(): String {
-        val nameBytes = name.encodeToByteArray()
-        val descriptionBytes = description.encodeToByteArray()
-        val songBytes = songs.asIterable()
-            .map { it.id }
-            .flatMap { it.encodeToByteArray().asIterable() }
-            .toByteArray()
+    val songVersion: String = songVersionHash()
+    val metadataVersion: String = metadataVersionHash()
+    val url: String
+        get() = "https://open.spotify.com/playlist/$id"
+    val uri: String
+        get() = "spotify:playlist:$id"
 
-        val combinedBytes = nameBytes + descriptionBytes + songBytes
+    private fun metadataVersionHash(): String = versionHash("${versionHash(name)},${versionHash(description)}")
+    private fun songVersionHash(): String = versionHash(songs.joinToString(",") { it.id })
 
-
-        val hash = DigestUtils.getSha256Digest().digest(combinedBytes)
+    private fun versionHash(value: String): String {
+        val bytes = value.encodeToByteArray()
+        val hash = DigestUtils.getSha256Digest().digest(bytes)
         return String(Hex.encodeHex(hash))
     }
 
-    fun isSyncRequired(): Boolean = currentVersion != lastSyncVersion
+    fun isMetadataSyncRequired() = metadataVersion != lastSyncMetadataVersion
+    fun isSongSyncRequired() = songVersion != lastSyncSongVersion
+    fun isSyncRequired(): Boolean = isMetadataSyncRequired() || isSongSyncRequired()
+
+    fun withSongs(songs: List<Song>): Playlist =
+        Playlist(id, songs, name, description, lastSyncMetadataVersion, lastSyncSongVersion)
 
     companion object {
-        fun calculateSyncActions(currentState: Playlist, desiredState: Playlist): List<PlaylistSyncAction> {
-            val actions: MutableList<PlaylistSyncAction> = mutableListOf()
+        private val ID_EXTRACTOR_REGEX: Regex =
+            """^https?://open\.spotify\.com/playlist/([0-9a-zA-Z]+)(?:\?.*$|$)""".toRegex()
 
-            if (currentState.name != desiredState.name) {
-                actions.add(UpdateNamePlaylistSyncAction(desiredState.name))
-            }
-
-            if (currentState.description != desiredState.description) {
-                actions.add(UpdateDescriptionPlaylistSyncAction(desiredState.description))
-            }
-
-            val currentSongs = currentState.songs.toSet()
-            val desiredSongs = desiredState.songs.toSet()
-
-            val songAdditions = desiredSongs.minus(currentSongs)
-            actions.addAll(songAdditions.asSequence()
-                .map { AddSongPlaylistSyncAction(it) }
-                .toList())
-
-            val songRemovals = currentSongs.minus(desiredSongs)
-            actions.addAll(songRemovals.asSequence()
-                .map { RemoveSongPlaylistSyncAction(it) }
-                .toList())
-
-            return actions.toList()
+        private fun extractId(url: String): String {
+            val matchResult = ID_EXTRACTOR_REGEX.find(url)!!
+            val (id) = matchResult.destructured
+            return id
         }
+
+        fun fromId(
+            id: String,
+            songs: List<Song> = emptyList(),
+            name: String = "",
+            description: String = "",
+            lastSyncMetadataVersion: String? = null,
+            lastSyncSongVersion: String? = null,
+        ) = Playlist(id, songs, name, description, lastSyncMetadataVersion, lastSyncSongVersion)
+
+        fun fromUrl(
+            url: String,
+            songs: List<Song> = emptyList(),
+            name: String = "",
+            description: String = "",
+            lastSyncMetadataVersion: String? = null,
+            lastSyncSongVersion: String? = null,
+        ) = Playlist(extractId(url), songs, name, description, lastSyncMetadataVersion, lastSyncSongVersion)
+    }
+
+    override fun toString(): String = "Playlist(name=$name, songCount=${songs.size}, id=$id)"
+    override fun hashCode(): Int = Objects.hash(id, songs, name, description)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Playlist
+
+        if (id != other.id) return false
+        if (songs != other.songs) return false
+        if (name != other.name) return false
+        if (description != other.description) return false
+        return true
     }
 }

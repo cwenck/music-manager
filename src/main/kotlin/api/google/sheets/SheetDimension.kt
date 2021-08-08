@@ -2,14 +2,17 @@ package api.google.sheets
 
 import com.google.common.math.IntMath
 
-class SheetDimension private constructor(val index: Int) {
+class SheetDimension private constructor(val index: Int) : Comparable<SheetDimension> {
     val number: Int = index + 1
     val name: String = indexToName(index)
 
     operator fun plus(count: Int): SheetDimension = fromIndex(index + count)
     operator fun minus(count: Int): SheetDimension = fromIndex(index - count)
-    operator fun compareTo(dim: SheetDimension): Int = index.compareTo(dim.index)
-    operator fun compareTo(value: Int): Int = index.compareTo(value)
+    override operator fun compareTo(other: SheetDimension): Int = index.compareTo(other.index)
+    operator fun compareTo(other: Int): Int = index.compareTo(other)
+
+    fun toCellAtRow(row: SheetDimension) = SheetCell.fromDimensions(this, row)
+    fun toCellAtColumn(col: SheetDimension) = SheetCell.fromDimensions(col, this)
 
     companion object {
         operator fun Int.compareTo(dimension: SheetDimension): Int = this.compareTo(dimension.index)
