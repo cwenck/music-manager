@@ -38,29 +38,4 @@ fun main(args: Array<String>) {
         sheetsPlaylistManager.updateVersions(worksheet, playlist)
         sheetsPlaylistManager.updateSongMetadata(worksheet, songsWithMetadata, songLocationRegistry)
     }
-
-
-//    val formatOne = SheetCellFormat(
-//        verticalAlignment = SheetVerticalAlignment.MIDDLE,
-//        horizontalAlignment = SheetHorizontalAlignment.CENTER,
-//        fontFamily = "Roboto Mono",
-//        fontSize = 10,
-//    )
-//    val formatTwo = SheetCellFormat(
-//        backgroundColor = SheetColor.BLACK,
-//        fontColor = SheetColor.WHITE,
-//    )
-//
-//    val values: Map<SheetCell, String> = mapOf(
-//        "C10" to "https://open.spotify.com/track/2oeqKWbVwK5Ly2vjwWJKHd",
-//        "C11" to "https://open.spotify.com/track/66tkDkPsznE5zIHNt4QkXB",
-//    ).mapKeys { it.key.toSheetCell() }
-//
-//    val formats: Map<SheetCell, SheetCellFormat> = mapOf(
-//        "C10" to formatOne,
-//        "C11" to formatTwo,
-//    ).mapKeys { it.key.toSheetCell() }
-//
-//    val sheetGrid = SheetGrid.fromValueMap("C10:C11".toSheetRange(), values, formats)
-//    sheetsApi.writeRangeWithFormatting(worksheet, sheetGrid)
 }
