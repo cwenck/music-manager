@@ -64,7 +64,7 @@ class SongWithoutMetadata(id: String) : Song(id) {
     }
 }
 
-private val ID_EXTRACTOR_REGEX: Regex = """^https?://open\.spotify\.com/track/([0-9a-zA-Z]+)(?:\?.*$|$)""".toRegex()
+private val ID_EXTRACTOR_REGEX: Regex = """^https?://open\.spotify\.com/track/([0-9a-zA-Z]{22})(?:\?.*$|$)""".toRegex()
 private fun extractId(url: String): String {
     val matchResult = ID_EXTRACTOR_REGEX.find(url)!!
     return matchResult.destructured.component1()

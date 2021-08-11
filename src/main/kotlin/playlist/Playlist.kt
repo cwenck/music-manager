@@ -38,7 +38,7 @@ class Playlist private constructor(
 
     companion object {
         private val ID_EXTRACTOR_REGEX: Regex =
-            """^https?://open\.spotify\.com/playlist/([0-9a-zA-Z]+)(?:\?.*$|$)""".toRegex()
+            """^https?://open\.spotify\.com/playlist/([0-9a-zA-Z]{22})(?:\?.*$|$)""".toRegex()
 
         private fun extractId(url: String): String {
             val matchResult = ID_EXTRACTOR_REGEX.find(url)!!

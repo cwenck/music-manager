@@ -4,6 +4,7 @@ import api.google.sheets.SheetDimension.Companion.compareTo
 import api.google.sheets.SheetDimension.Companion.fromIndex
 import api.google.sheets.SheetDimension.Companion.fromName
 import api.google.sheets.SheetDimension.Companion.fromNumber
+import com.google.api.services.sheets.v4.model.GridRange
 
 class SheetCell private constructor(val col: SheetDimension, val row: SheetDimension) {
     fun toSheetNotation() = "${col.name}${row.number}"
@@ -37,6 +38,14 @@ class SheetCell private constructor(val col: SheetDimension, val row: SheetDimen
         if (count > col) throw IllegalArgumentException("Count cannot exceed the column index")
         return SheetCell(col - count, row)
     }
+
+    fun toGridRange(worksheet: Worksheet): GridRange = GridRange()
+        .setSheetId(worksheet.id)
+        .setStartRowIndex(row.index)
+        .setEndRowIndex(row.index + 1)
+        .setStartColumnIndex(col.index)
+        .setEndColumnIndex(col.index + 1)
+
 
     companion object {
         private val SHEET_NOTATION_REGEX = """^([A-Z]+)([1-9][0-9]*)$""".toRegex()

@@ -1,5 +1,6 @@
 package api.google.sheets
 
+import com.google.api.services.sheets.v4.model.GridRange
 import kotlin.math.max
 import kotlin.math.min
 
@@ -42,7 +43,6 @@ class SheetRange constructor(
             null
         }
     }
-
 
     fun columnsSequence(): Sequence<SheetDimension> = generateSequence(startCell.col) { dim ->
         if (dim < endCell.col) {
@@ -100,6 +100,13 @@ class SheetRange constructor(
         return SheetCell.fromIndexes(colIndex, rowIndex)
     }
 
+    fun toGridRange(worksheet: Worksheet): GridRange = GridRange()
+        .setSheetId(worksheet.id)
+        .setStartRowIndex(startCell.row.index)
+        .setEndRowIndex(endCell.row.index + 1)
+        .setStartColumnIndex(startCell.col.index)
+        .setEndColumnIndex(endCell.col.index + 1)
+
     fun toSheetNotation() =
         if (isSingleCellRange()) {
             startCell.toSheetNotation()
@@ -107,7 +114,7 @@ class SheetRange constructor(
             "${startCell.toSheetNotation()}:${endCell.toSheetNotation()}"
         }
 
-    fun toSheetNotation(title: String) = "$title!${toSheetNotation()}"
+    fun toSheetNotation(worksheet: Worksheet) = "${worksheet.title}!${toSheetNotation()}"
 
     fun isSingleCellRange(): Boolean = startCell == endCell
     fun isMultiCellRange(): Boolean = !isSingleCellRange()
